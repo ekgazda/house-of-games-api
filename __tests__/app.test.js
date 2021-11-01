@@ -1,6 +1,37 @@
-const db = require('../db/connection.js');
-const testData = require('../db/data/test-data/index.js');
-const { seed } = require('../db/seeds/seed.js');
+const request = require('supertest')
+const app = require('../app')
+const db = require('../db/connection.js')
+const testData = require('../db/data/test-data/index.js')
+const seed = require('../db/seeds/seed.js')
 
-beforeEach(() => seed(testData));
-afterAll(() => db.end());
+beforeEach(() => seed(testData))
+afterAll(() => db.end())
+
+describe('app testing', () => {
+  it('status:404, responds with message path not found', () => {
+    return request(app)
+      .get('/api/notPath')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('path not found')
+      })
+  })
+})
+describe('GET /api/categories', () => {
+  test('status:200, responds with an array of categories objects', () => {
+    return request(app)
+      .get('/api/categories')
+      .expect(200)
+      .then(({ body }) => {
+        const { categories } = body
+        expect(categories).toBeInstanceOf(Array)
+        expect(categories).toHaveLength(4)
+        categories.forEach((category) =>
+          expect(category).toEqual({
+            slug: expect.any(String),
+            description: expect.any(String),
+          }),
+        )
+      })
+  })
+})
