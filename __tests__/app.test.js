@@ -36,23 +36,41 @@ describe('GET /api/categories', () => {
   })
 })
 describe.only('GET /api/reviews/:review_id', () => {
-  test('status:200, responds with a single matching review object', () => {
+  const output = {
+    review_id: 1,
+    title: 'Agricola',
+    designer: 'Uwe Rosenberg',
+    owner: 'mallionaire',
+    review_img_url:
+      'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+    review_body: 'Farmyard fun!',
+    category: 'euro game',
+    created_at: new Date(1610964020514).toISOString(),
+    votes: 1,
+    comment_count: 0,
+  }
+  test('status:200, responds with a single matching review, which has a comment_count property from comments table', () => {
     return request(app)
       .get(`/api/reviews/1`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.review).toEqual({
-          review_id: 1,
-          title: 'Agricola',
-          designer: 'Uwe Rosenberg',
-          owner: 'mallionaire',
-          review_img_url:
-            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
-          review_body: 'Farmyard fun!',
-          category: 'euro game',
-          created_at: new Date(1610964020514).toISOString(),
-          votes: 1,
-        })
+        expect(body.review).toEqual(output)
+      })
+  })
+  test('status:404, responds with error message if non-existing review_id is entered', () => {
+    return request(app)
+      .get(`/api/reviews/300000`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('no review found')
+      })
+  })
+  test('status:400, responds with error message for invalid review_id', () => {
+    return request(app)
+      .get(`/api/reviews/notAnId`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
       })
   })
 })
