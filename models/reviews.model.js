@@ -1,7 +1,7 @@
 const db = require('../db/connection')
 const { convertStrValueToNum } = require('../utils')
 
-exports.selectReviewById = async (review_id) => {
+exports.selectReviewById = async (reviewId) => {
   const selectQuery = `
   SELECT
   reviews.review_id,
@@ -19,11 +19,25 @@ exports.selectReviewById = async (review_id) => {
   WHERE reviews.review_id = $1
   GROUP BY reviews.review_id`
 
-  const { rows } = await db.query(selectQuery, [review_id])
+  const { rows } = await db.query(selectQuery, [reviewId])
   const formattedReview = convertStrValueToNum(rows[0], 'comment_count')
 
   if (rows.length === 0) {
-    return Promise.reject({ status: 404, msg: 'no review found' })
+    throw 'not found'
   }
   return formattedReview
+}
+
+exports.increaseVotesOnReviewById = async (reviewId, voteAmount) => {
+  const patchQuery = `
+    UPDATE reviews
+    SET votes = votes + $2
+    WHERE review_id = $1
+    RETURNING *
+  `
+  const { rows } = await db.query(patchQuery, [reviewId, voteAmount])
+  if (rows.length === 0) {
+    throw 'not found'
+  }
+  return rows[0]
 }

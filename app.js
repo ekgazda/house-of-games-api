@@ -5,6 +5,7 @@ const {
   handleCustomErrors,
   handle500Errors,
   handlePsqlErrors,
+  handle404Errors,
 } = require('./controllers/errors.controller.js')
 
 app.use(express.json())
@@ -13,6 +14,7 @@ app.use('/api', apiRouter)
 
 app.use(handleCustomErrors)
 app.use(handlePsqlErrors)
+app.use(handle404Errors)
 app.use(handle500Errors)
 
 app.all('/*', (req, res) => {
