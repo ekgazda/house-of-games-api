@@ -56,6 +56,8 @@ exports.fetchSortedReviews = async (
     'votes',
     'comment_count',
   ]
+  if (!sortByOptions.includes(sort_by) || !['asc', 'desc'].includes(order))
+    throw 'invalid query'
 
   let getReviewsQuery = `
   SELECT
@@ -77,14 +79,13 @@ exports.fetchSortedReviews = async (
     queryValues.push(category)
     getReviewsQuery += `WHERE reviews.category = $1`
   }
-  console.log(queryValues)
-  console.log(getReviewsQuery)
 
   getReviewsQuery += `
   GROUP BY reviews.review_id
   ORDER BY ${sort_by} ${order};`
 
   const { rows } = await db.query(getReviewsQuery, queryValues)
+  if (rows.length === 0) throw 'not found'
 
   return rows
 }

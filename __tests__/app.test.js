@@ -127,7 +127,7 @@ describe('PATCH /api/reviews/:review_id', () => {
       })
   })
 })
-describe('GET /api/reviews', () => {
+describe.only('GET /api/reviews', () => {
   test('status:200, responds with an array of reviews objects, which have a comment_count property', () => {
     return request(app)
       .get('/api/reviews')
@@ -164,12 +164,28 @@ describe('GET /api/reviews', () => {
         })
       })
   })
-  test('status:200, accepts order query and responds with reviews sorted desc by default', () => {
+  test('status:400, responds with error for invalid sort_by query', () => {
+    return request(app)
+      .get('/api/reviews?sort_by=notacolumn')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid query')
+      })
+  })
+  test('status:200, accepts order query and responds with reviews sorted (desc by default)', () => {
     return request(app)
       .get(`/api/reviews?sort_by=created_at&order=asc`)
       .expect(200)
       .then(({ body }) => {
         expect(body.reviews).toBeSortedBy('created_at')
+      })
+  })
+  test('status:400, responds with error for invalid order query', () => {
+    return request(app)
+      .get('/api/reviews?order=notanorder')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid query')
       })
   })
   test('status:200, accepts category query and responds with reviews filtered', () => {
@@ -179,6 +195,14 @@ describe('GET /api/reviews', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.reviews).toHaveLength(11)
+      })
+  })
+  test('status:404, responds with error for category query that does not exist', () => {
+    return request(app)
+      .get('/api/reviews?category=notacategory')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('not found')
       })
   })
 })
