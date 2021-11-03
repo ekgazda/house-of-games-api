@@ -3,7 +3,6 @@ const app = require('../app')
 const db = require('../db/connection.js')
 const testData = require('../db/data/test-data/index.js')
 const seed = require('../db/seeds/seed.js')
-const { fetchAllReviews } = require('../models/reviews.model')
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
@@ -125,6 +124,61 @@ describe('PATCH /api/reviews/:review_id', () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe('not found')
+      })
+  })
+})
+describe('GET /api/reviews', () => {
+  test('status:200, responds with an array of reviews objects, which have a comment_count property', () => {
+    return request(app)
+      .get('/api/reviews')
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body
+        expect(reviews).toBeInstanceOf(Array)
+        expect(reviews).toHaveLength(13)
+        expect(reviews[0].hasOwnProperty('comment_count')).toBe(true)
+        reviews.forEach((review) =>
+          expect(review).toEqual({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_img_url: expect.any(String),
+            review_body: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number),
+          }),
+        )
+      })
+  })
+  test('status:200, accepts sort_by query and responds with reviews sorted by the query criteria', () => {
+    const sortCriteria = 'title'
+    return request(app)
+      .get(`/api/reviews?sort_by=${sortCriteria}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toBeSortedBy(`${sortCriteria}`, {
+          descending: true,
+        })
+      })
+  })
+  test('status:200, accepts order query and responds with reviews sorted desc by default', () => {
+    return request(app)
+      .get(`/api/reviews?sort_by=created_at&order=asc`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toBeSortedBy('created_at')
+      })
+  })
+  test('status:200, accepts category query and responds with reviews filtered', () => {
+    const categoryFilter = 'social deduction'
+    return request(app)
+      .get(`/api/reviews?category=${categoryFilter}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toHaveLength(11)
       })
   })
 })
