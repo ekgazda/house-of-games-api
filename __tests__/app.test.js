@@ -3,6 +3,7 @@ const app = require('../app')
 const db = require('../db/connection.js')
 const testData = require('../db/data/test-data/index.js')
 const seed = require('../db/seeds/seed.js')
+const { fetchAllReviews } = require('../models/reviews.model')
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
@@ -55,6 +56,7 @@ describe('GET /api/reviews/:review_id', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.review).toEqual(output)
+        expect(body.review.comment_count).toBe(0)
       })
   })
   test('status:404, responds with error message if non-existing review_id is entered', () => {
