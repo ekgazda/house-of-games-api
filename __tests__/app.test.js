@@ -3,6 +3,7 @@ const app = require('../app')
 const db = require('../db/connection.js')
 const testData = require('../db/data/test-data/index.js')
 const seed = require('../db/seeds/seed.js')
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
@@ -314,13 +315,23 @@ describe('POST /api/reviews/:review_id/comments', () => {
       })
   })
 })
-describe.only('DELETE /api/comments/:comment_id', () => {
+describe('DELETE /api/comments/:comment_id', () => {
   test('status:204, removes specified comment and responds with an empty object', () => {
     return request(app)
     .delete(`/api/comments/3`)
     .expect(204)
     .then(({body}) => {
       expect(body).toEqual({})
+    })
+  })
+})
+describe('GET /api', () => {
+  test('status:200, responds with an object describing available endpoints on the API', () => {
+    return request(app)
+    .get('/api')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.endpoints).toEqual(endpoints)
     })
   })
 })
