@@ -33,3 +33,11 @@ exports.addCommentForReviewById = async (reviewId, newComment) => {
   ])
   return rows[0]
 }
+
+exports.removeCommentById = async (commentId) => {
+  const removeCommQuery = `
+  DELETE FROM comments
+  WHERE comment_id = $1`
+  const {rows} = await db.query(removeCommQuery, [commentId])
+  return rows
+}
