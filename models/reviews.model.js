@@ -89,21 +89,3 @@ exports.fetchSortedReviews = async (
 
   return rows
 }
-
-exports.fetchCommentsForReviewById = async (reviewId) => {
-  const getCommentsQuery = `
-  SELECT
-    comments.comment_id,
-    comments.votes,
-    comments.created_at,
-    comments.author,
-    comments.body
-  FROM comments
-  JOIN reviews ON comments.review_id = reviews.review_id
-  WHERE comments.review_id = $1
-  GROUP BY comments.comment_id`
-
-  const { rows } = await db.query(getCommentsQuery, [reviewId])
-  if (rows.length === 0) throw 'not found'
-  return rows
-}
