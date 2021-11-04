@@ -314,3 +314,13 @@ describe('POST /api/reviews/:review_id/comments', () => {
       })
   })
 })
+describe.only('DELETE /api/comments/:comment_id', () => {
+  test('status:204, removes specified comment and responds with an empty object', () => {
+    return request(app)
+    .delete(`/api/comments/3`)
+    .expect(204)
+    .then(({body}) => {
+      expect(body).toEqual({})
+    })
+  })
+})
