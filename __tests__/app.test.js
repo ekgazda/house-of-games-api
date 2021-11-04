@@ -127,7 +127,7 @@ describe('PATCH /api/reviews/:review_id', () => {
       })
   })
 })
-describe.only('GET /api/reviews', () => {
+describe('GET /api/reviews', () => {
   test('status:200, responds with an array of reviews objects, which have a comment_count property', () => {
     return request(app)
       .get('/api/reviews')
@@ -203,6 +203,45 @@ describe.only('GET /api/reviews', () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe('not found')
+      })
+  })
+})
+describe.only('GET /api/reviews/:review_id/comments', () => {
+  test('status:200, responds with an array of comments for the given review_id', () => {
+    return request(app)
+      .get('/api/reviews/3/comments')
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body
+        expect(comments).toBeInstanceOf(Array)
+        expect(comments).toHaveLength(3)
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            }),
+          )
+        })
+      })
+  })
+  test('status:404, responds with error message if non-existing review_id is entered', () => {
+    return request(app)
+      .get(`/api/reviews/300000/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('not found')
+      })
+  })
+  test('status:400, responds with error message for invalid review_id', () => {
+    return request(app)
+      .get(`/api/reviews/notAnId/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
       })
   })
 })
