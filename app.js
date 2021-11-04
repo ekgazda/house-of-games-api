@@ -9,6 +9,10 @@ const {
 
 app.use(express.json())
 
+app.get('/', (req, res) => {
+  res.status(200).send({ msg: 'connected to the games server' })
+})
+
 app.use('/api', apiRouter)
 
 app.use(handleCustomErrors)

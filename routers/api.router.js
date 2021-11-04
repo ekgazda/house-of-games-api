@@ -2,10 +2,9 @@ const apiRouter = require('express').Router()
 const categoriesRouter = require('./categories.router')
 const reviewsRouter = require('./reviews.router')
 const commentsRouter = require('./comments.router')
+const { getAllEndpoints } = require('../controllers/api.controller')
 
-apiRouter.get('/', (req, res) => {
-  res.status(200).send({ msg: 'connected to the games server' })
-})
+apiRouter.route('/').get(getAllEndpoints)
 
 apiRouter.use('/categories', categoriesRouter)
 apiRouter.use('/reviews', reviewsRouter)
