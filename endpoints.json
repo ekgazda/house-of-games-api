@@ -15,7 +15,7 @@
     }
   },
   "GET /api/reviews": {
-    "description": "serves an array of all reviews",
+    "description": "serves an array of all reviews with comment count from comments table",
     "queries": ["category", "sort_by", "order"],
     "exampleResponse": {
       "reviews": [
@@ -26,9 +26,83 @@
           "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
           "category": "hidden-roles",
           "created_at": 1610964101251,
-          "votes": 5
+          "votes": 5,
+          "comment_count": 4
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves an object of the specified review with comment count from comments table",
+    "queries": [],
+    "exampleResponse": {
+      "review": 
+        {
+          "title": "Culture a Love of Agriculture With Agricola",
+          "designer": "Uwe Rosenberg",
+          "owner": "tickle122",
+          "review_img_url": "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260", 
+          "review_body": "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+          "category": "strategy",
+          "created_at": 1610964020514,
+          "votes": 1,
+          "comment_count": 3
+        }
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "increments the review votes with the input number on the specified review object",
+    "queries": [],
+    "exampleInput": { "inc_votes": 10 },
+    "exampleResponse": {
+      "review": [
+        {
+          "title": "Culture a Love of Agriculture With Agricola",
+          "designer": "Uwe Rosenberg",
+          "owner": "tickle122",
+          "review_img_url": "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260", 
+          "review_body": "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+          "category": "strategy",
+          "created_at": 1610964020514,
+          "votes": 11,
+          "comment_count": 3
+        }
+      ]
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves an array of comments for the specified review",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+        "comment_id": 1,
+        "votes": 16,
+        "created_at": 1511354163389,
+        "author": "happyamy2016",
+        "body": "I loved this game too!"
+        }
+      ]
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "posts a comment for the specified review",
+    "queries": [],
+    "exampleInput": { "username": "grumpy19", "body": "This is a new comment" },
+    "exampleResponse": {
+      "comment":
+        {
+          "comment_id": 63,
+          "votes": 0,
+          "created_at": "2021-11-22T12:36:03.389Z",
+          "author": "grumpy19",
+          "body": "This is a new comment"
+        }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "removes the specified comment from the database",
+    "queries": [],
+    "exampleResponse": {}
   }
 }
