@@ -206,7 +206,7 @@ describe('GET /api/reviews', () => {
       })
   })
 })
-describe.only('GET /api/reviews/:review_id/comments', () => {
+describe('GET /api/reviews/:review_id/comments', () => {
   test('status:200, responds with an array of comments for the given review_id', () => {
     return request(app)
       .get('/api/reviews/3/comments')
@@ -242,6 +242,28 @@ describe.only('GET /api/reviews/:review_id/comments', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe('invalid input')
+      })
+  })
+})
+describe.only('POST /api/reviews/:review_id/comments', () => {
+  test('status:201, adds new comment to the database and responds with that comment', () => {
+    const newComment = {
+      username: 'pumpkinhead',
+      body: 'This is a spooky game',
+    }
+    return request(app)
+      .post(`/api/reviews/8/comments`)
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          comment_id: 7,
+          body: 'This is a spooky game',
+          votes: 0,
+          author: 'pumpkinhead',
+          review_id: 8,
+          created_at: new Date(1610964588110),
+        })
       })
   })
 })
