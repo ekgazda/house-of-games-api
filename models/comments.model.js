@@ -19,7 +19,6 @@ exports.fetchCommentsForReviewById = async (reviewId) => {
 }
 
 exports.addCommentForReviewById = async (reviewId, newComment) => {
-  const { username, body } = newComment
   const newCommentQuery = `
   INSERT INTO comments 
   (review_id, author, body)
@@ -27,6 +26,10 @@ exports.addCommentForReviewById = async (reviewId, newComment) => {
   ($1, $2, $3)
   RETURNING *`
 
-  const { rows } = await db.query(newCommentQuery, [reviewId, newComment])
+  const { rows } = await db.query(newCommentQuery, [
+    reviewId,
+    newComment.username,
+    newComment.body,
+  ])
   return rows[0]
 }

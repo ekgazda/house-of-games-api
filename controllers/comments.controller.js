@@ -12,7 +12,6 @@ exports.getCommentsForReviewById = (req, res, next) => {
 
 exports.postCommentForReviewById = (req, res, next) => {
   const { review_id } = req.params
-  const { username, body } = req.body
   addCommentForReviewById(review_id, req.body)
     .then((comment) => res.status(201).send({ comment }))
     .catch(next)

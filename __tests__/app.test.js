@@ -245,10 +245,10 @@ describe('GET /api/reviews/:review_id/comments', () => {
       })
   })
 })
-describe.only('POST /api/reviews/:review_id/comments', () => {
+describe('POST /api/reviews/:review_id/comments', () => {
   test('status:201, adds new comment to the database and responds with that comment', () => {
     const newComment = {
-      username: 'pumpkinhead',
+      username: 'dav3rid',
       body: 'This is a spooky game',
     }
     return request(app)
@@ -260,10 +260,57 @@ describe.only('POST /api/reviews/:review_id/comments', () => {
           comment_id: 7,
           body: 'This is a spooky game',
           votes: 0,
-          author: 'pumpkinhead',
+          author: 'dav3rid',
           review_id: 8,
-          created_at: new Date(1610964588110),
+          created_at: expect.any(String),
         })
+      })
+  })
+  test('status:400, responds with error when author is missing from input', () => {
+    const badComment = { username: null, body: 'This is a bad comment' }
+    const badComment2 = { username: 'notauser', body: 'also a bad comment' }
+    return request(app)
+      .post(`/api/reviews/8/comments`)
+      .send(badComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('input missing')
+      })
+  })
+  test('status:400, responds with error when author does not exist in users database', () => {
+    const badComment = { username: 'notauser', body: 'also a bad comment' }
+    return request(app)
+      .post(`/api/reviews/8/comments`)
+      .send(badComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
+      })
+  })
+  test('status:400, responds with error when inserting wrong datatype', () => {
+    const badComment = { username: 96226, body: 30000 }
+    return request(app)
+      .post(`/api/reviews/8/comments`)
+      .send(badComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
+      })
+  })
+  test('status:404, responds with error if non-existing review_id is entered', () => {
+    return request(app)
+      .get(`/api/reviews/300000/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('not found')
+      })
+  })
+  test('status:400, responds with error for invalid review_id', () => {
+    return request(app)
+      .get(`/api/reviews/notAnId/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
       })
   })
 })
