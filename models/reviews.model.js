@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const {fetchCategoryBySlug} = require('./categories.model')
 
 exports.selectReviewById = async (reviewId) => {
   const selectQuery = `
@@ -20,7 +21,7 @@ exports.selectReviewById = async (reviewId) => {
 
   const { rows } = await db.query(selectQuery, [reviewId])
   if (rows.length === 0) {
-    throw 'not found'
+    return Promise.reject({status:404, msg: 'review not found'})
   }
   return rows[0]
 }
@@ -34,7 +35,7 @@ exports.increaseVotesOnReviewById = async (reviewId, voteAmount) => {
   `
   const { rows } = await db.query(patchQuery, [reviewId, voteAmount])
   if (rows.length === 0) {
-    throw 'not found'
+    return Promise.reject({status:404, msg: 'review not found'})
   }
   return rows[0]
 }
@@ -56,36 +57,41 @@ exports.fetchSortedReviews = async (
     'votes',
     'comment_count',
   ]
-  if (!sortByOptions.includes(sort_by) || !['asc', 'desc'].includes(order))
-    throw 'invalid query'
+  if (!sortByOptions.includes(sort_by) || !['asc', 'desc'].includes(order)) {
+    return Promise.reject({status:400, msg: 'invalid query'})
+  }
 
   let getReviewsQuery = `
-  SELECT
-    reviews.review_id,
-    reviews.title,
-    reviews.designer,
-    reviews.owner,
-    reviews.review_img_url,
-    reviews.review_body,
-    reviews.category,
-    reviews.created_at,
-    reviews.votes,
-  count(comments.comment_id)::INT AS comment_count 
-  FROM reviews
-  LEFT JOIN comments ON reviews.review_id = comments.review_id
+    SELECT
+      reviews.review_id,
+      reviews.title,
+      reviews.designer,
+      reviews.owner,
+      reviews.review_img_url,
+      reviews.review_body,
+      reviews.category,
+      reviews.created_at,
+      reviews.votes,
+      count(comments.comment_id)::INT AS comment_count 
+    FROM reviews
+    LEFT JOIN comments ON reviews.review_id = comments.review_id
   `
   const queryValues = []
-  if (category) {
+  if(category) {
     queryValues.push(category)
     getReviewsQuery += `WHERE reviews.category = $1`
   }
 
   getReviewsQuery += `
-  GROUP BY reviews.review_id
-  ORDER BY ${sort_by} ${order};`
-
+    GROUP BY reviews.review_id
+    ORDER BY ${sort_by} ${order};
+  `
   const { rows } = await db.query(getReviewsQuery, queryValues)
-  if (rows.length === 0) throw 'not found'
-
+  if(rows.length === 0) {
+    if (!await fetchCategoryBySlug(category)) {
+      return Promise.reject({status:404, msg: 'category not found'}) 
+    }
+  }
   return rows
 }
+
