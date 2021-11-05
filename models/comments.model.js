@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const { selectReviewById } = require('./reviews.model')
 
 exports.fetchCommentsForReviewById = async (reviewId) => {
   const getCommentsQuery = `
@@ -13,8 +14,10 @@ exports.fetchCommentsForReviewById = async (reviewId) => {
   WHERE comments.review_id = $1
   GROUP BY comments.comment_id`
 
-  const { rows } = await db.query(getCommentsQuery, [reviewId])
-  if (rows.length === 0) throw 'not found'
+  const { rows } =  await db.query(getCommentsQuery, [reviewId])
+  if (!await selectReviewById(reviewId)) {
+      return Promise.reject({status:404, msg: 'review not found'})
+    }
   return rows
 }
 

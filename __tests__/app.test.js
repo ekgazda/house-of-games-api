@@ -50,7 +50,7 @@ describe('GET /api/reviews/:review_id', () => {
     votes: 1,
     comment_count: 0,
   }
-  test('status:200, responds with a single matching review, which has a comment_count property from comments table', () => {
+  test('status:200, responds with a single matching review, which has a `comment_count` property from comments table', () => {
     return request(app)
       .get(`/api/reviews/1`)
       .expect(200)
@@ -59,15 +59,15 @@ describe('GET /api/reviews/:review_id', () => {
         expect(body.review.comment_count).toBe(0)
       })
   })
-  test('status:404, responds with error message if non-existing review_id is entered', () => {
+  test('status:404, responds with error message if non-existing `review_id` is entered', () => {
     return request(app)
       .get(`/api/reviews/300000`)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('review not found')
       })
   })
-  test('status:400, responds with error message for invalid review_id', () => {
+  test('status:400, responds with error message for invalid `review_id`', () => {
     return request(app)
       .get(`/api/reviews/notAnId`)
       .expect(400)
@@ -78,7 +78,7 @@ describe('GET /api/reviews/:review_id', () => {
 })
 describe('PATCH /api/reviews/:review_id', () => {
   const voteAmount = { inc_votes: 10 }
-  test('status:200, responds with a matching review object with its vote property updated', () => {
+  test('status:200, responds with a matching review object with its `vote` property updated', () => {
     const output = {
       review_id: 5,
       title: 'Proident tempor et.',
@@ -100,7 +100,7 @@ describe('PATCH /api/reviews/:review_id', () => {
         expect(body.review).toEqual(output)
       })
   })
-  test('status:400, responds with error message for invalid review_id', () => {
+  test('status:400, responds with error message for invalid `review_id`', () => {
     return request(app)
       .patch(`/api/reviews/notAnId`)
       .send(voteAmount)
@@ -118,18 +118,18 @@ describe('PATCH /api/reviews/:review_id', () => {
         expect(body.msg).toBe('invalid input')
       })
   })
-  test('status:404, responds with error message if non-existing review_id is entered', () => {
+  test('status:404, responds with error message if non-existing `review_id` is entered', () => {
     return request(app)
       .patch(`/api/reviews/900000`)
       .send(voteAmount)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('review not found')
       })
   })
 })
 describe('GET /api/reviews', () => {
-  test('status:200, responds with an array of reviews objects, which have a comment_count property', () => {
+  test('status:200, responds with an array of reviews objects, which have a `comment_count` property', () => {
     return request(app)
       .get('/api/reviews')
       .expect(200)
@@ -154,7 +154,7 @@ describe('GET /api/reviews', () => {
         )
       })
   })
-  test('status:200, accepts sort_by query and responds with reviews sorted by the query criteria', () => {
+  test('status:200, accepts sort query and responds with reviews sorted by the query criteria', () => {
     const sortCriteria = 'title'
     return request(app)
       .get(`/api/reviews?sort_by=${sortCriteria}`)
@@ -165,7 +165,7 @@ describe('GET /api/reviews', () => {
         })
       })
   })
-  test('status:400, responds with error for invalid sort_by query', () => {
+  test('status:400, responds with error for invalid sort query', () => {
     return request(app)
       .get('/api/reviews?sort_by=notacolumn')
       .expect(400)
@@ -173,7 +173,7 @@ describe('GET /api/reviews', () => {
         expect(body.msg).toBe('invalid query')
       })
   })
-  test('status:200, accepts order query and responds with reviews sorted (desc by default)', () => {
+  test('status:200, accepts order query and responds with reviews sorted', () => {
     return request(app)
       .get(`/api/reviews?sort_by=created_at&order=asc`)
       .expect(200)
@@ -181,6 +181,14 @@ describe('GET /api/reviews', () => {
         expect(body.reviews).toBeSortedBy('created_at')
       })
   })
+  test('status:200, default sort & order queries are `created_at` and `desc`', () => {
+    return request(app)
+      .get(`/api/reviews?sort+by`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toBeSortedBy('created_at', {descending: true})
+  })
+})
   test('status:400, responds with error for invalid order query', () => {
     return request(app)
       .get('/api/reviews?order=notanorder')
@@ -198,17 +206,26 @@ describe('GET /api/reviews', () => {
         expect(body.reviews).toHaveLength(11)
       })
   })
+  test('status:200, responds with an empty array for a valid `category` query which has no reviews', () => {
+    const categoryFilter = 'children\'s games'
+    return request(app)
+      .get(`/api/reviews?category=${categoryFilter}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.reviews).toEqual([])
+      })
+  })
   test('status:404, responds with error for category query that does not exist', () => {
     return request(app)
       .get('/api/reviews?category=notacategory')
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('category not found')
       })
   })
 })
 describe('GET /api/reviews/:review_id/comments', () => {
-  test('status:200, responds with an array of comments for the given review_id', () => {
+  test('status:200, responds with an array of comments for the given `review_id`', () => {
     return request(app)
       .get('/api/reviews/3/comments')
       .expect(200)
@@ -229,15 +246,23 @@ describe('GET /api/reviews/:review_id/comments', () => {
         })
       })
   })
-  test('status:404, responds with error message if non-existing review_id is entered', () => {
+  test('status:200, responds with an empty array for a valid `review_id` which has no comments', () => {
+    return request(app)
+      .get(`/api/reviews/1/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([])
+      })
+  })
+  test('status:404, responds with error message if non-existing `review_id` is entered', () => {
     return request(app)
       .get(`/api/reviews/300000/comments`)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('review not found')
       })
   })
-  test('status:400, responds with error message for invalid review_id', () => {
+  test('status:400, responds with error message for invalid `review_id`', () => {
     return request(app)
       .get(`/api/reviews/notAnId/comments`)
       .expect(400)
@@ -250,7 +275,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
   test('status:201, adds new comment to the database and responds with that comment', () => {
     const newComment = {
       username: 'dav3rid',
-      body: 'This is a spooky game',
+      body: 'This is a spooky game'
     }
     return request(app)
       .post(`/api/reviews/8/comments`)
@@ -269,7 +294,6 @@ describe('POST /api/reviews/:review_id/comments', () => {
   })
   test('status:400, responds with error when author is missing from input', () => {
     const badComment = { username: null, body: 'This is a bad comment' }
-    const badComment2 = { username: 'notauser', body: 'also a bad comment' }
     return request(app)
       .post(`/api/reviews/8/comments`)
       .send(badComment)
@@ -283,30 +307,20 @@ describe('POST /api/reviews/:review_id/comments', () => {
     return request(app)
       .post(`/api/reviews/8/comments`)
       .send(badComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('invalid input')
+        expect(body.msg).toBe('does not exist')
       })
   })
-  test('status:400, responds with error when inserting wrong datatype', () => {
-    const badComment = { username: 96226, body: 30000 }
-    return request(app)
-      .post(`/api/reviews/8/comments`)
-      .send(badComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('invalid input')
-      })
-  })
-  test('status:404, responds with error if non-existing review_id is entered', () => {
+  test('status:404, responds with error if non-existing `review_id` is entered', () => {
     return request(app)
       .get(`/api/reviews/300000/comments`)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('review not found')
       })
   })
-  test('status:400, responds with error for invalid review_id', () => {
+  test('status:400, responds with error for invalid `review_id`', () => {
     return request(app)
       .get(`/api/reviews/notAnId/comments`)
       .expect(400)
@@ -324,6 +338,14 @@ describe('DELETE /api/comments/:comment_id', () => {
       expect(body).toEqual({})
     })
   })
+  // test('status:404, error when non-existing `comment_id` is entered', () => {
+  //   return request(app)
+  //   .get(`/api/comments/39853`)
+  //   .expect(404)
+  //   .then(({body}) => {
+  //     expect(body.msg).toBe('comment does not exists')
+  //   })
+  // })
 })
 describe('GET /api', () => {
   test('status:200, responds with an object describing available endpoints on the API', () => {
@@ -333,5 +355,10 @@ describe('GET /api', () => {
     .then(({body}) => {
       expect(body.endpoints).toEqual(endpoints)
     })
+  })
+})
+describe('GET /api/users', () => {
+  test('status:200, responds with an array of users', () => {
+
   })
 })
