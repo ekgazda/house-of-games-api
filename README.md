@@ -1,6 +1,6 @@
 # Eniko's House of Games API
 
-Welcome to my Northcoders API project!
+Welcome to my Northcoders API project!\
 Check out the hosted version: https://eg-house-of-games.herokuapp.com/
 
 ## Project summary
@@ -13,12 +13,17 @@ It is built with:
 
 Clone this repo:
 
-git clone git@github.com:ekgazda/eg-house-of-games.git
+`git clone git@github.com:ekgazda/eg-house-of-games.git`
 
-Run the following command:
+Run the following command to install dependencies:
 
-npm install
+`npm install`
 
-Add these files:
+Create these files:
 
+`.env.development` add `PGDATABASE=nc_games` into it\
+`.env.test` add `PGDATABASE=nc_games_test` into it
 
+Run the followoing command to set up the databases:
+
+`npm run setup-dbs`
