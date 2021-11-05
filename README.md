@@ -1,7 +1,7 @@
 # Eniko's House of Games API
 
 Welcome to my Northcoders API project!\
-Check out the hosted version: https://eg-house-of-games.herokuapp.com/
+Check out the hosted version here: https://eg-house-of-games.herokuapp.com/api
 
 ## Project summary
 
