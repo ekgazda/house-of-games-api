@@ -78,6 +78,9 @@ exports.fetchSortedReviews = async (
   `
   const queryValues = []
   if(category) {
+    if (!await fetchCategoryBySlug(category)) {
+      return Promise.reject({status:404, msg: 'category not found'}) 
+    }
     queryValues.push(category)
     getReviewsQuery += `WHERE reviews.category = $1`
   }
@@ -87,11 +90,6 @@ exports.fetchSortedReviews = async (
     ORDER BY ${sort_by} ${order};
   `
   const { rows } = await db.query(getReviewsQuery, queryValues)
-  if(rows.length === 0) {
-    if (!await fetchCategoryBySlug(category)) {
-      return Promise.reject({status:404, msg: 'category not found'}) 
-    }
-  }
   return rows
 }
 
