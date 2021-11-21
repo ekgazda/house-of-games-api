@@ -359,6 +359,40 @@ describe('GET /api', () => {
 })
 describe('GET /api/users', () => {
   test('status:200, responds with an array of users', () => {
-
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body
+        expect(users).toBeInstanceOf(Array)
+        expect(users).toHaveLength(4)
+        users.forEach((user) =>
+          expect(user).toEqual({
+            username: expect.any(String)
+          })
+        )
+      })
+  })
+})
+describe.only('GET /api/users/:username', () => {
+  test('status:200, responds with a single matching user, which has `username`, `avatar_url` and `name` properties', () => {
+    return request(app)
+      .get(`/api/users/dav3rid`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user).toEqual({
+          username: expect.any(String),
+          avatar_url: expect.any(String),
+          name: expect.any(String)
+        })
+      })
+  })
+  test('status:404, responds with error if non-existing `username` is entered', () => {
+    return request(app)
+      .get(`/api/users/notAUser`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('user not found')
+      })
   })
 })
