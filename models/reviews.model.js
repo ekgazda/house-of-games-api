@@ -1,5 +1,5 @@
 const db = require('../db/connection')
-const {fetchCategoryBySlug} = require('./categories.model')
+const { fetchCategoryBySlug } = require('./categories.model')
 
 exports.selectReviewById = async (reviewId) => {
   const selectQuery = `
@@ -26,6 +26,7 @@ exports.selectReviewById = async (reviewId) => {
   return rows[0]
 }
 
+
 exports.increaseVotesOnReviewById = async (reviewId, voteAmount) => {
   const patchQuery = `
     UPDATE reviews
@@ -39,6 +40,7 @@ exports.increaseVotesOnReviewById = async (reviewId, voteAmount) => {
   }
   return rows[0]
 }
+
 
 exports.fetchSortedReviews = async (
   sort_by = 'created_at',
@@ -76,20 +78,18 @@ exports.fetchSortedReviews = async (
     FROM reviews
     LEFT JOIN comments ON reviews.review_id = comments.review_id
   `
-  const queryValues = []
+
   if(category) {
-    if (!await fetchCategoryBySlug(category)) {
-      return Promise.reject({status:404, msg: 'category not found'}) 
+    if (await fetchCategoryBySlug(category)) {
+      getReviewsQuery += `WHERE reviews.category = '${category}'`
     }
-    queryValues.push(category)
-    getReviewsQuery += `WHERE reviews.category = $1`
   }
 
   getReviewsQuery += `
     GROUP BY reviews.review_id
-    ORDER BY ${sort_by} ${order};
+    ORDER BY ${sort_by} ${order}
   `
-  const { rows } = await db.query(getReviewsQuery, queryValues)
+  const { rows } = await db.query(getReviewsQuery)
   return rows
 }
 

@@ -15,10 +15,9 @@ const fetchCommentsForReviewById = async (reviewId) => {
     GROUP BY comments.comment_id`
 
   const { rows } =  await db.query(getCommentsQuery, [reviewId])
-  if (!await selectReviewById(reviewId)) {
-      return Promise.reject({ status:404, msg: 'review not found'} )
-    }
-  return rows
+  if (await selectReviewById(reviewId)) {
+    return rows
+  } 
 }
 
 const addCommentForReviewById = async (reviewId, newComment) => {

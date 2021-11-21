@@ -207,7 +207,7 @@ describe('GET /api/reviews', () => {
       })
   })
   test('status:200, responds with an empty array for a valid `category` query which has no reviews', () => {
-    const categoryFilter = 'children\'s games'
+    const categoryFilter = 'childrens games'
     return request(app)
       .get(`/api/reviews?category=${categoryFilter}`)
       .expect(200)

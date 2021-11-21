@@ -6,6 +6,11 @@ exports.fetchAllCategories = async () => {
 }
 
 exports.fetchCategoryBySlug = async (slug) => {
-  const {rows} = await db.query(`SELECT * FROM categories WHERE slug = $1;`, [slug]);
+  const {rows} = await db.query(`SELECT * FROM categories WHERE slug = $1;`, [slug])
+  if (rows.length === 0) {
+    return Promise.reject({ status:404, msg: 'category not found' }) 
+  }
   return rows[0]
 }
+
+
