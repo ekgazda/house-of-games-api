@@ -302,7 +302,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
         expect(body.msg).toBe('input missing')
       })
   })
-  test('status:400, responds with error when author does not exist in users database', () => {
+  test('status:404, responds with error when author does not exist in users database', () => {
     const badComment = { username: 'notauser', body: 'also a bad comment' }
     return request(app)
       .post(`/api/reviews/8/comments`)
@@ -329,6 +329,39 @@ describe('POST /api/reviews/:review_id/comments', () => {
       })
   })
 })
+describe('GET /api/comments/:comment_id', () => {
+  test('status:200, responds with a single matching comment', () => {
+    return request(app)
+      .get(`/api/comments/1`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          comment_id: expect.any(Number),
+          body: expect.any(String),
+          votes: expect.any(Number),
+          author: expect.any(String),
+          review_id: expect.any(Number),
+          created_at: expect.any(String)
+        })
+      })
+  })
+  test('status:404, responds with error if non-existing `comment_id` is entered', () => {
+    return request(app)
+      .get(`/api/comments/00000`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('comment not found')
+      })
+  })
+  test('status:400, responds with error for invalid `comment_id`', () => {
+    return request(app)
+      .get(`/api/comments/notAnId`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
+      })
+  })
+})
 describe('DELETE /api/comments/:comment_id', () => {
   test('status:204, removes specified comment and responds with an empty object', () => {
     return request(app)
@@ -338,14 +371,22 @@ describe('DELETE /api/comments/:comment_id', () => {
       expect(body).toEqual({})
     })
   })
-  // test('status:404, error when non-existing `comment_id` is entered', () => {
-  //   return request(app)
-  //   .get(`/api/comments/39853`)
-  //   .expect(404)
-  //   .then(({body}) => {
-  //     expect(body.msg).toBe('comment does not exists')
-  //   })
-  // })
+  test('status:404, error when non-existing `comment_id` is entered', () => {
+    return request(app)
+    .get(`/api/comments/39853`)
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe('comment not found')
+    })
+  })
+  test('status:400, responds with error for invalid `comment_id`', () => {
+    return request(app)
+      .get(`/api/comments/notAnId`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input')
+      })
+  })
 })
 describe('GET /api', () => {
   test('status:200, responds with an object describing available endpoints on the API', () => {
@@ -374,7 +415,7 @@ describe('GET /api/users', () => {
       })
   })
 })
-describe.only('GET /api/users/:username', () => {
+describe('GET /api/users/:username', () => {
   test('status:200, responds with a single matching user, which has `username`, `avatar_url` and `name` properties', () => {
     return request(app)
       .get(`/api/users/dav3rid`)
