@@ -1,18 +1,15 @@
 const express = require('express')
 const app = express()
 const apiRouter = require('./routers/api.router')
+const cors = require('cors')
 const {
   handleCustomErrors,
   handle500Errors,
   handlePsqlErrors,
 } = require('./controllers/errors.controller.js')
 
+app.use(cors())
 app.use(express.json())
-
-app.get('/', (req, res) => {
-  res.status(200).send({ msg: 'connected to the games server' })
-})
-
 app.use('/api', apiRouter)
 
 app.use(handleCustomErrors)
