@@ -1,7 +1,9 @@
 # Eniko's House of Games API
 
-Welcome to my Northcoders API project!\
+This is my Northcoders API project.\
 Check out the hosted version here: https://eg-house-of-games.herokuapp.com/api
+
+..and the frontend project which is using this API: https://eg-house-of-games.netlify.app
 
 ## Project summary
 
@@ -19,7 +21,7 @@ Minimum software requirements
 
 Clone this repo:
 
-`git clone git@github.com:ekgazda/eg-house-of-games.git`
+`git clone git@github.com:ekgazda/house-of-games-api.git`
 
 Run the following commands:
 
