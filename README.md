@@ -1,11 +1,11 @@
-# Eniko's House of Games API
+## Eniko's House of Games API
 
 This is my Northcoders API project.\
 Check out the hosted version here: https://eg-house-of-games.herokuapp.com/api
 
 ..and the frontend project which is using this API: https://eg-house-of-games.netlify.app
 
-## Project summary
+### Project summary
 
 Building an API for the purpose of mimicking a real world backend service, using:
 - [Node.js](https://nodejs.org/en/) runtime 
@@ -13,10 +13,10 @@ Building an API for the purpose of mimicking a real world backend service, using
 - [express](https://expressjs.com/) web framework 
 - [jest](https://jestjs.io/), [jest-sorted](https://www.npmjs.com/package/jest-sorted) and [supertest](https://www.npmjs.com/package/supertest) testing (w/ TDD)
 
-## Initial setup
+### Initial setup
 
 Minimum software requirements
-- Node.js v17.0.1 - [install here](https://nodejs.dev/learn/how-to-install-nodejs)
+- Node.js v16.13.1 - [install here](https://nodejs.dev/learn/how-to-install-nodejs)
 - postgreSQL v14.00 - [install here](https://www.postgresql.org/download/)
 
 Clone this repo:
@@ -37,7 +37,7 @@ Run the following commands:
 
 `npm run setup-dbs && npm run seed`
 
-## Instructions for use
+### Instructions for use
 
 Run the server
 
